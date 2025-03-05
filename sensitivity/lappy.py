@@ -25,11 +25,11 @@ class spec:
 #------------------------------------------------------------------------
 #------------------------------------------------------------------------
 # LAPYUTA spec
-def get_lap_spec(inst='mrs'):
+def get_lap_spec(inst='mrs', model='baseline'):
 
     # Typical geocorona brightness for LAPYUTA [erg/s/cm2/arcsec2/A]
     I_Lya = 6.1e-14   # 2kR (HST daytime / 10)
-    I_1304 = 5.7e-17  # 2R  (HISAKI daytime)
+    I_1304 = 5.7e-17  # 2R  (HISAKI)
     I_1356 = 0.0
 
     a = (60.0/2.0)**2 * scipy.constants.pi
@@ -41,7 +41,7 @@ def get_lap_spec(inst='mrs'):
         w = 1.0 
         n_w = 10                 # 1A幅 (1/d)
         n_s = 18                 # 1arcsec幅 (1/m)
-        description = 'LAPYUTA MRS'
+        description = 'LAPYUTA MRS ' + model
     elif inst == 'hrs':
         pix_sz = 15.0  # detector pixel size [micro-meter/pixel]
         d = 0.015
@@ -49,7 +49,7 @@ def get_lap_spec(inst='mrs'):
         w = 1.0 
         n_w = 67                 # 1A幅 (1/d)
         n_s = 3                  # 1arcsec幅 (1/m)
-        description = 'LAPYUTA HRS'
+        description = 'LAPYUTA HRS ' + model
 
     # detector noise
     cr_r_min = 0.3  * (pix_sz * 1e-4)**2  # /s/cm2 -> /s/pixel
@@ -196,7 +196,7 @@ def get_uvex_spec():
 #------------------------------------------------------------------------
 #------------------------------------------------------------------------
 # LAPYUTA Ae
-def get_lap_ae(inst='mrs'):
+def get_lap_ae(inst='mrs', model='baseline'):
     filename = 'LAPYUTA/LAPYUTA_sensitivity_20240328.csv'
     ae_array = np.loadtxt(filename, skiprows=1, delimiter=',')
     wl_ = ae_array[:,0] * 10.0  # [A]
@@ -204,7 +204,10 @@ def get_lap_ae(inst='mrs'):
     d_wl = 0.005  # [A]
     nw = int((wl_[-1] - wl_[0]) / d_wl)
     lap_wl = np.linspace(wl_[0], wl_[-1], nw)
-    lap_ae = scipy.interpolate.interp1d(wl_, ae_array[:,2])(lap_wl) # MRS Target
+    if model == 'baseline':
+        lap_ae = scipy.interpolate.interp1d(wl_,ae_array[:,1])(lap_wl) # MRS Baseline
+    else: # target
+        lap_ae = scipy.interpolate.interp1d(wl_, ae_array[:,2])(lap_wl) # MRS Target
     #ae_mrs_baseline = scipy.interpolate.interp1d(wl_,ae_array[:,1])(lap_wl)
     #ae_mrs_target   = scipy.interpolate.interp1d(wl_,ae_array[:,2])(lap_wl)
     #ae_uvi_baseline = scipy.interpolate.interp1d(wl_,ae_array[:,3])(lap_wl)

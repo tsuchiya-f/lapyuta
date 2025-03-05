@@ -4,3 +4,5 @@ sensitivity/temp
 sensitivity/LAPYUTA/team
 *.png
 .DS_Store
+__pycache__
+~*.*
